@@ -17,18 +17,16 @@ func scanIPforPorts(ip string, ports []int) {
 		wg.Add(1)
 		go func(p int) {
 			defer wg.Done()
-			address := net.JoinHostPort(ip, strconv.Itoa(port))
+			address := net.JoinHostPort(ip, strconv.Itoa(p))
 
 			conn, err := net.DialTimeout("tcp", address, timeout)
 			if err != nil {
 				return
 			}
 
-			if err == nil {
-				fmt.Println("port is open: ", port)
+			fmt.Println("port is open: ", p)
 
-				conn.Close()
-			}
+			conn.Close()
 		}(port)
 	}
 
