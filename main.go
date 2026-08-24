@@ -1,8 +1,8 @@
 package main
 
 func main() {
-	var ports []int
-	ports = append(ports, 123, 80, 430)
+
+	ports := []int{22, 80, 443, 8080}
 
 	scanIPforPorts("google.com", ports)
 }
