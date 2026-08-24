@@ -2,22 +2,49 @@ package main
 
 import (
 	"fmt"
-	"strconv"
+	"net/netip"
+	"sync"
 )
 
 func main() {
+	ports := []int{80, 25565}
 
-	ports := []int{22, 80, 443, 8080}
-
-	scanRange("87.251.74.", ports)
+	scanRange("89.22.224.0/21", ports)
 }
 
-func scanRange(r string, p []int) {
-	for i := 0; i <= 255; i++ {
-		ip := r + strconv.Itoa(i)
-
-		fmt.Println("scanning", ip)
-		scanIPforPorts(ip, p)
-
+func scanRange(cidrStr string, p []int) {
+	prefix, err := netip.ParsePrefix(cidrStr)
+	if err != nil {
+		fmt.Println("Wrong format:", cidrStr)
+		return
 	}
+
+	var wg sync.WaitGroup
+
+	maxRoutines := 1000
+	guard := make(chan struct{}, maxRoutines)
+
+	currentIP := prefix.Masked().Addr()
+
+	for prefix.Contains(currentIP) {
+		guard <- struct{}{}
+		wg.Add(1)
+
+		go func(ip netip.Addr) {
+			defer wg.Done()
+			defer func() {
+				<-guard
+			}()
+
+			ipStr := ip.String()
+
+			scanIPforPorts(ipStr, p)
+		}(currentIP)
+
+		currentIP = currentIP.Next()
+	}
+
+	wg.Wait()
+	close(guard)
+	fmt.Println("Done")
 }
