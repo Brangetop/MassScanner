@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	ports := []int{80, 25565}
+	ports := []int{25565}
 
 	scanRange("89.22.224.0/21", ports)
 }
@@ -21,7 +21,7 @@ func scanRange(cidrStr string, p []int) {
 
 	var wg sync.WaitGroup
 
-	maxRoutines := 1000
+	maxRoutines := 100
 	guard := make(chan struct{}, maxRoutines)
 
 	currentIP := prefix.Masked().Addr()
