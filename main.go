@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	ports := []int{25565}
+	ports := []int{} // Enter the ports to scan, e.g. 80
 
-	scanRange("89.22.224.0/21", ports)
+	scanRange("", ports) // Try aeza: 89.22.224.0/21
 }
 
 func scanRange(cidrStr string, p []int) {
